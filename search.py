@@ -1,244 +1,290 @@
-# Python implementation of the 
-# Sorting visualiser: Insertion Sort 
-  
-import pygame 
-import random 
-import time 
-  
-  
-pygame.font.init() 
-startTime = time.time() 
-  
-# Total window 
-screen = pygame.display.set_mode( 
-    (900, 650) 
-) 
-  
-# Title and Icon 
-pygame.display.set_caption( 
-    "SEARCH ALGORITHM VISUALISER"
-) 
-  
-# Uncomment below lines for setting 
-# up the icon for the visuliser 
-# img = pygame.image.load('sorticon.png') 
-# pygame.display.set_icon(img) 
-  
-# Boolean variable to run 
-# the program in while loop 
-run = True
-  
-# Window size and some initials 
-width = 900
-length = 600
-array = [0]*151
-key = 0
-foundkey = False
-arr_clr = [(0, 204, 102)]*151
-clr_ind = 0
-clr = [(0, 204, 102), (255, 0, 0), 
-       (0, 0, 153), (255, 102, 0)] 
-bigfont = pygame.font.SysFont("comicsans", 70) 
-fnt = pygame.font.SysFont("comicsans", 30) 
-fnt1 = pygame.font.SysFont("comicsans", 20) 
-  
-# Sorting Algorithm: Heap Sort 
-def heapSort(array): 
-    
-    n = len(array) 
-      
-    for i in range(n//2-1, -1, -1): 
-        heapify(array, i, n) 
-      
-    for i in range(n-1, 0, -1): 
-        array[i], array[0] = array[0], array[i] 
-        heapify(array, 0, i) 
-  
-  
-def heapify(array, root, size): 
-      
-    left = root*2+1
-    right = root*2+2
-    largest = root 
-      
-    if left < size and array[left] > array[largest]: 
-        largest = left 
-      
-    if right < size and array[right] > array[largest]: 
-        largest = right 
-      
-    if largest != root: 
-        array[largest], array[root] = array[root], array[largest] 
-        heapify(array, largest, size) 
+import numpy as np
+import random
+import pygame
+import sys
+import math
 
-def bfs(array, root):
-# Function to generate new Array 
-def generate_arr(): 
-      
-    for i in range(1, 151): 
-        arr_clr[i] = clr[0] 
-        array[i] = random.randrange(1, 100) 
-    heapSort(array) 
-  
-  
-# Initially generate a array 
-generate_arr() 
-  
-# Function to refill the 
-# updates on the window 
-def refill(): 
-      
-    screen.fill((255, 255, 255)) 
-    draw() 
-    pygame.display.update() 
-    pygame.time.delay(200) 
-  
-  
-def ternarySearch(array, key): 
-    left = 1
-    right = len(array)-1
-  
-    while left <= right: 
-        pygame.event.pump() 
-        arr_clr[left] = clr[1] 
-        arr_clr[right] = clr[1] 
-        mid1 = left+(right-left)//3
-        mid2 = right-(right-left)//3
-        arr_clr[mid1] = clr[3] 
-        arr_clr[mid2] = clr[3] 
-        refill() 
-        pygame.event.pump() 
-        refill() 
-        refill() 
-        arr_clr[left] = clr[0] 
-        arr_clr[right] = clr[0] 
-        arr_clr[mid1] = clr[0] 
-        arr_clr[mid2] = clr[0] 
-          
-        if key == array[mid1]: 
-            arr_clr[mid1] = clr[2] 
-            return 1
-          
-        if key == array[mid2]: 
-            arr_clr[mid1] = clr[2] 
-            return 1
-  
-        if key < array[mid1]: 
-            right = mid1-1
-        elif key > array[mid2]: 
-            left = mid2+1
-        else: 
-            left = mid1+1
-            right = mid2-1
-        refill() 
-  
-    return -1
-    
-# Function to Draw the array values 
-def draw(): 
-    
-    # Text should be rendered 
-    txt = fnt.render("SEARCH: PRESS 'ENTER'", 
-                     1, (0, 0, 0)) 
-      
-    # Position where text is placed 
-    screen.blit(txt, (20, 20)) 
-    txt1 = fnt.render("NEW ARRAY: PRESS 'R'", 
-                      1, (0, 0, 0)) 
-    screen.blit(txt1, (20, 40)) 
-  
-    txt2 = fnt1.render("ENTER NUMBER TO SEARCH:" +
-                       str(key), 1, (0, 0, 0)) 
-    screen.blit(txt2, (600, 60)) 
-  
-    text3 = fnt1.render("Running Time(sec): " +
-                        str(int(time.time() - startTime)), 
-                        1, (0, 0, 0)) 
-    screen.blit(text3, (600, 20)) 
-  
-    element_width = (width-150)//150
-    boundry_arr = 900 / 150
-    boundry_grp = 550 / 100
-    pygame.draw.line(screen, (0, 0, 0), (0, 95), 
-                     (900, 95), 6) 
-  
-    # Drawing the array values as lines 
-    for i in range(1, 151): 
-        pygame.draw.line(screen, arr_clr[i], 
-                         (boundry_arr * i-3, 100), 
-                         (boundry_arr * i-3, 
-                          array[i]*boundry_grp + 100), element_width) 
-    if foundkey == 1: 
-        text4 = bigfont.render("Key Found. Press N to Reset Key", 1, (0, 0, 0)) 
-        screen.blit(text4, (100, 300)) 
-  
-    elif foundkey == -1: 
-        text4 = bigfont.render( 
-            "Key Not Found. Press N to Reset Key", 1, (0, 0, 0)) 
-        screen.blit(text4, (30, 300)) 
-  
-  
-# Program should be run 
-# continuously to keep the window open 
-while run: 
-    
-    # background 
-    screen.fill((255, 255, 255)) 
-  
-    # Event handler stores all event 
-    for event in pygame.event.get(): 
-  
-        # If we click Close button in window 
-        if event.type == pygame.QUIT: 
-            run = False
-        if event.type == pygame.KEYDOWN: 
-              
-            if event.key == pygame.K_r: 
-                key = 0
-                foundkey = 0
-                generate_arr() 
-              
-            if event.key == pygame.K_n: 
-                foundkey = 0
-                key = 0
-                for i in range(0, len(array)): 
-                    arr_clr[i] = clr[0] 
-  
-            if event.key == pygame.K_RETURN and key != 0: 
-                foundkey = ternarySearch(array, key) 
-                print("hello") 
-  
-            if event.key == pygame.K_0: 
-                key = key*10
-  
-            if event.key == pygame.K_1: 
-                key = key*10+1
-  
-            if event.key == pygame.K_2: 
-                key = key*10+2
-  
-            if event.key == pygame.K_3: 
-                key = key*10+3
-  
-            if event.key == pygame.K_4: 
-                key = key*10+4
-  
-            if event.key == pygame.K_5: 
-                key = key*10+5
-  
-            if event.key == pygame.K_6: 
-                key = key*10+6
-  
-            if event.key == pygame.K_7: 
-                key = key*10+7
-  
-            if event.key == pygame.K_8: 
-                key = key*10+8
-  
-            if event.key == pygame.K_9: 
-                key = key*10+9
-  
-    draw() 
-    pygame.display.update() 
-  
-pygame.quit() 
+BLUE = (0,0,255)
+BLACK = (0,0,0)
+RED = (255,0,0)
+YELLOW = (255,255,0)
+
+ROW_COUNT = 10
+COLUMN_COUNT = 7
+
+PLAYER = 0
+AI = 1
+
+EMPTY = 0
+PLAYER_PIECE = 1
+AI_PIECE = 2
+
+WINDOW_LENGTH = 4
+
+def create_board():
+	board = np.zeros((ROW_COUNT,COLUMN_COUNT))
+	return board
+
+def drop_piece(board, row, col, piece):
+	board[row][col] = piece
+
+def is_valid_location(board, col):
+	return board[ROW_COUNT-1][col] == 0
+
+def get_next_open_row(board, col):
+	for r in range(ROW_COUNT):
+		if board[r][col] == 0:
+			return r
+
+def print_board(board):
+	print(np.flip(board, 0))
+
+def winning_move(board, piece):
+	# Check horizontal locations for win
+	for c in range(COLUMN_COUNT-3):
+		for r in range(ROW_COUNT):
+			if board[r][c] == piece and board[r][c+1] == piece and board[r][c+2] == piece and board[r][c+3] == piece:
+				return True
+
+	# Check vertical locations for win
+	for c in range(COLUMN_COUNT):
+		for r in range(ROW_COUNT-3):
+			if board[r][c] == piece and board[r+1][c] == piece and board[r+2][c] == piece and board[r+3][c] == piece:
+				return True
+
+	# Check positively sloped diaganols
+	for c in range(COLUMN_COUNT-3):
+		for r in range(ROW_COUNT-3):
+			if board[r][c] == piece and board[r+1][c+1] == piece and board[r+2][c+2] == piece and board[r+3][c+3] == piece:
+				return True
+
+	# Check negatively sloped diaganols
+	for c in range(COLUMN_COUNT-3):
+		for r in range(3, ROW_COUNT):
+			if board[r][c] == piece and board[r-1][c+1] == piece and board[r-2][c+2] == piece and board[r-3][c+3] == piece:
+				return True
+
+def evaluate_window(window, piece):
+	score = 0
+	opp_piece = PLAYER_PIECE
+	if piece == PLAYER_PIECE:
+		opp_piece = AI_PIECE
+
+	if window.count(piece) == 4:
+		score += 100
+	elif window.count(piece) == 3 and window.count(EMPTY) == 1:
+		score += 5
+	elif window.count(piece) == 2 and window.count(EMPTY) == 2:
+		score += 2
+
+	if window.count(opp_piece) == 3 and window.count(EMPTY) == 1:
+		score -= 4
+
+	return score
+
+def score_position(board, piece):
+	score = 0
+
+	## Score center column
+	center_array = [int(i) for i in list(board[:, COLUMN_COUNT//2])]
+	center_count = center_array.count(piece)
+	score += center_count * 3
+
+	## Score Horizontal
+	for r in range(ROW_COUNT):
+		row_array = [int(i) for i in list(board[r,:])]
+		for c in range(COLUMN_COUNT-3):
+			window = row_array[c:c+WINDOW_LENGTH]
+			score += evaluate_window(window, piece)
+
+	## Score Vertical
+	for c in range(COLUMN_COUNT):
+		col_array = [int(i) for i in list(board[:,c])]
+		for r in range(ROW_COUNT-3):
+			window = col_array[r:r+WINDOW_LENGTH]
+			score += evaluate_window(window, piece)
+
+	## Score posiive sloped diagonal
+	for r in range(ROW_COUNT-3):
+		for c in range(COLUMN_COUNT-3):
+			window = [board[r+i][c+i] for i in range(WINDOW_LENGTH)]
+			score += evaluate_window(window, piece)
+
+	for r in range(ROW_COUNT-3):
+		for c in range(COLUMN_COUNT-3):
+			window = [board[r+3-i][c+i] for i in range(WINDOW_LENGTH)]
+			score += evaluate_window(window, piece)
+
+	return score
+
+def is_terminal_node(board):
+	return winning_move(board, PLAYER_PIECE) or winning_move(board, AI_PIECE) or len(get_valid_locations(board)) == 0
+
+def minimax(board, depth, alpha, beta, maximizingPlayer):
+	valid_locations = get_valid_locations(board)
+	is_terminal = is_terminal_node(board)
+	if depth == 0 or is_terminal:
+		if is_terminal:
+			if winning_move(board, AI_PIECE):
+				return (None, 100000000000000)
+			elif winning_move(board, PLAYER_PIECE):
+				return (None, -10000000000000)
+			else: # Game is over, no more valid moves
+				return (None, 0)
+		else: # Depth is zero
+			return (None, score_position(board, AI_PIECE))
+	if maximizingPlayer:
+		value = -math.inf
+		column = random.choice(valid_locations)
+		for col in valid_locations:
+			row = get_next_open_row(board, col)
+			b_copy = board.copy()
+			drop_piece(b_copy, row, col, AI_PIECE)
+			new_score = minimax(b_copy, depth-1, alpha, beta, False)[1]
+			if new_score > value:
+				value = new_score
+				column = col
+			alpha = max(alpha, value)
+			if alpha >= beta:
+				break
+		return column, value
+
+	else: # Minimizing player
+		value = math.inf
+		column = random.choice(valid_locations)
+		for col in valid_locations:
+			row = get_next_open_row(board, col)
+			b_copy = board.copy()
+			drop_piece(b_copy, row, col, PLAYER_PIECE)
+			new_score = minimax(b_copy, depth-1, alpha, beta, True)[1]
+			if new_score < value:
+				value = new_score
+				column = col
+			beta = min(beta, value)
+			if alpha >= beta:
+				break
+		return column, value
+
+def get_valid_locations(board):
+	valid_locations = []
+	for col in range(COLUMN_COUNT):
+		if is_valid_location(board, col):
+			valid_locations.append(col)
+	return valid_locations
+
+def pick_best_move(board, piece):
+
+	valid_locations = get_valid_locations(board)
+	best_score = -10000
+	best_col = random.choice(valid_locations)
+	for col in valid_locations:
+		row = get_next_open_row(board, col)
+		temp_board = board.copy()
+		drop_piece(temp_board, row, col, piece)
+		score = score_position(temp_board, piece)
+		if score > best_score:
+			best_score = score
+			best_col = col
+
+	return best_col
+
+def draw_board(board):
+	for c in range(COLUMN_COUNT):
+		for r in range(ROW_COUNT):
+			pygame.draw.rect(screen, BLUE, (c*SQUARESIZE, r*SQUARESIZE+SQUARESIZE, SQUARESIZE, SQUARESIZE))
+			pygame.draw.circle(screen, BLACK, (int(c*SQUARESIZE+SQUARESIZE/2), int(r*SQUARESIZE+SQUARESIZE+SQUARESIZE/2)), RADIUS)
+	
+	for c in range(COLUMN_COUNT):
+		for r in range(ROW_COUNT):		
+			if board[r][c] == PLAYER_PIECE:
+				pygame.draw.circle(screen, RED, (int(c*SQUARESIZE+SQUARESIZE/2), height-int(r*SQUARESIZE+SQUARESIZE/2)), RADIUS)
+			elif board[r][c] == AI_PIECE: 
+				pygame.draw.circle(screen, YELLOW, (int(c*SQUARESIZE+SQUARESIZE/2), height-int(r*SQUARESIZE+SQUARESIZE/2)), RADIUS)
+	pygame.display.update()
+
+board = create_board()
+print_board(board)
+game_over = False
+
+pygame.init()
+
+SQUARESIZE = 100
+
+width = COLUMN_COUNT * SQUARESIZE
+height = (ROW_COUNT+1) * SQUARESIZE
+
+size = (width, height)
+
+RADIUS = int(SQUARESIZE/2 - 5)
+
+screen = pygame.display.set_mode(size)
+draw_board(board)
+pygame.display.update()
+
+myfont = pygame.font.SysFont("monospace", 75)
+
+turn = random.randint(PLAYER, AI)
+
+while not game_over:
+
+	for event in pygame.event.get():
+		if event.type == pygame.QUIT:
+			sys.exit()
+
+		if event.type == pygame.MOUSEMOTION:
+			pygame.draw.rect(screen, BLACK, (0,0, width, SQUARESIZE))
+			posx = event.pos[0]
+			if turn == PLAYER:
+				pygame.draw.circle(screen, RED, (posx, int(SQUARESIZE/2)), RADIUS)
+
+		pygame.display.update()
+
+		if event.type == pygame.MOUSEBUTTONDOWN:
+			pygame.draw.rect(screen, BLACK, (0,0, width, SQUARESIZE))
+			#print(event.pos)
+			# Ask for Player 1 Input
+			if turn == PLAYER:
+				posx = event.pos[0]
+				col = int(math.floor(posx/SQUARESIZE))
+
+				if is_valid_location(board, col):
+					row = get_next_open_row(board, col)
+					drop_piece(board, row, col, PLAYER_PIECE)
+
+					if winning_move(board, PLAYER_PIECE):
+						label = myfont.render("Player 1 wins!!", 1, RED)
+						screen.blit(label, (40,10))
+						game_over = True
+
+					turn += 1
+					turn = turn % 2
+
+					print_board(board)
+					draw_board(board)
+
+
+	# # Ask for Player 2 Input
+	if turn == AI and not game_over:				
+
+		#col = random.randint(0, COLUMN_COUNT-1)
+		#col = pick_best_move(board, AI_PIECE)
+		col, minimax_score = minimax(board, 5, -math.inf, math.inf, True)
+
+		if is_valid_location(board, col):
+			#pygame.time.wait(500)
+			row = get_next_open_row(board, col)
+			drop_piece(board, row, col, AI_PIECE)
+
+			if winning_move(board, AI_PIECE):
+				label = myfont.render("Player 2 wins!!", 1, YELLOW)
+				screen.blit(label, (40,10))
+				game_over = True
+
+			print_board(board)
+			draw_board(board)
+
+			turn += 1
+			turn = turn % 2
+
+	if game_over:
+		pygame.time.wait(3000)

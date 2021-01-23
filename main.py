@@ -1,4 +1,7 @@
 import pygame 
+import numpy as np 
+
+
 
 # initiate game
 pygame.init()
@@ -44,6 +47,12 @@ while running:
 
     
     playerX += playerX_change
+
+    if playerX <= 0:
+        playerX = 0
+
+    if playerX >= 900:
+        playerX = 900 - 100
     player(playerX, playerY)
 
     pygame.display.update()
