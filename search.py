@@ -4,12 +4,12 @@ import pygame
 import sys
 import math
 
-BLUE = (0,0,255)
+BLUE = (204,204,255)
 BLACK = (0,0,0)
 RED = (255,0,0)
 YELLOW = (255,255,0)
 
-ROW_COUNT = 10
+ROW_COUNT = 6
 COLUMN_COUNT = 7
 
 PLAYER = 0
@@ -287,4 +287,4 @@ while not game_over:
 			turn = turn % 2
 
 	if game_over:
-		pygame.time.wait(3000)
+		pygame.time.wait(5000)
